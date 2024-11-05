@@ -1,0 +1,161 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.2">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;title&gt;2024 Election Dashboard&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;script src="https://unpkg.com/babel-standalone@6/babel.min.js"&gt;&lt;/script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;script src="https://unpkg.com/lucide-react@0.294.0/dist/umd/lucide-react.min.js"&gt;&lt;/script&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div id="root"&gt;&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;script type="text/babel"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>// Dashboard Component</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const ElectionDashboard = () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const [data, setData] = useState(null);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const [lastUpdated, setLastUpdated] = useState(null);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const [autoRefresh, setAutoRefresh] = useState(true);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const REFRESH_INTERVAL = 30000; // 30 seconds</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const battlegroundStates = [</p>
+<p class="p1"><span class="Apple-converted-space">        </span>'AZ', 'GA', 'MI', 'NV', 'NC', 'PA', 'WI', 'TX', 'IA', 'FL'</p>
+<p class="p1"><span class="Apple-converted-space">      </span>];</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const fetchData = async () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>const response = await window.fs.readFile('results-president.json');</p>
+<p class="p1"><span class="Apple-converted-space">          </span>const content = new TextDecoder().decode(response);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>const parsedData = JSON.parse(content);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>setData(parsedData);</p>
+<p class="p1"><span class="Apple-converted-space">          </span>setLastUpdated(new Date().toLocaleTimeString());</p>
+<p class="p1"><span class="Apple-converted-space">        </span>} catch (error) {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>console.error('Error fetching data:', error);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>useEffect(() =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>fetchData();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let interval;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (autoRefresh) {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>interval = setInterval(fetchData, REFRESH_INTERVAL);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return () =&gt; clearInterval(interval);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}, [autoRefresh]);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const getStateResult = (stateAbbr) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (!data || !data.races) return null;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return data.races.find(race =&gt; race.reporting_units[0].state_postal === stateAbbr);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const formatMargin = (margin) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (!margin) return '-';</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const sign = margin &gt; 0 ? 'D+' : 'R+';</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return `${sign}${Math.abs(margin).toFixed(1)}`;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const getLeadingCandidate = (race) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (!race || !race.reporting_units[0].candidates) return null;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const candidates = race.reporting_units[0].candidates;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const maxVotes = Math.max(...candidates.map(c =&gt; c.votes.total));</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return candidates.find(c =&gt; c.votes.total === maxVotes);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>const getReportingPercentage = (race) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (!race || !race.reporting_units[0]) return 0;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>const unit = race.reporting_units[0];</p>
+<p class="p1"><span class="Apple-converted-space">        </span>return ((unit.precincts_reporting / unit.precincts_total) * 100).toFixed(1);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>return (</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;div className="max-w-6xl mx-auto p-4 space-y-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div className="flex justify-between items-center"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;h1 className="text-2xl font-bold"&gt;2024 Election Night Dashboard&lt;/h1&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div className="flex items-center gap-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;span className="text-sm text-gray-500"&gt;Last updated: {lastUpdated}&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;button</p>
+<p class="p1"><span class="Apple-converted-space">                </span>onClick={() =&gt; setAutoRefresh(!autoRefresh)}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>className="inline-flex items-center px-3 py-2 text-sm font-medium bg-gray-600 text-white rounded hover:bg-gray-700"</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>{autoRefresh ? "Pause" : "Play"}</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;button</p>
+<p class="p1"><span class="Apple-converted-space">                </span>onClick={fetchData}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>className="inline-flex items-center px-3 py-2 text-sm font-medium bg-blue-600 text-white rounded hover:bg-blue-700"</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>Refresh</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/button&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">          </span>{/* Battleground States */}</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;div className="bg-white rounded-lg shadow p-6"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;h2 className="text-xl font-semibold mb-4"&gt;Battleground States&lt;/h2&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;div className="overflow-x-auto"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;table className="w-full text-left"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;thead&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;tr className="border-b"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;th className="pb-2"&gt;State&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;th className="pb-2"&gt;Leader&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;th className="pb-2"&gt;2024 Margin&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;th className="pb-2"&gt;2020 Margin&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;th className="pb-2"&gt;Swing&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>&lt;th className="pb-2"&gt;Reporting&lt;/th&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>&lt;/tr&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/thead&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;tbody&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>{battlegroundStates.map(stateAbbr =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const stateResult = getStateResult(stateAbbr);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const historical = stateResult?.reporting_units[0]?.historical_2020_pres;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>return (</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;tr key={stateAbbr} className="border-b"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;td className="py-2 font-medium"&gt;{stateAbbr}&lt;/td&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;td className="py-2"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>{getLeadingCandidate(stateResult)?.nyt_id === 'harris-k' ? (</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;span className="px-2 py-1 text-xs font-semibold bg-blue-100 text-blue-800 rounded"&gt;Harris&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>) : getLeadingCandidate(stateResult)?.nyt_id === 'trump-d' ? (</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>&lt;span className="px-2 py-1 text-xs font-semibold bg-red-100 text-red-800 rounded"&gt;Trump&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                          </span>) : '-'}</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/td&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;td className="py-2"&gt;{formatMargin(0)}&lt;/td&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;td className="py-2"&gt;{formatMargin(historical?.margin)}&lt;/td&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;td className="py-2"&gt;-&lt;/td&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>&lt;td className="py-2"&gt;{getReportingPercentage(stateResult)}%&lt;/td&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                      </span>&lt;/tr&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>);</p>
+<p class="p1"><span class="Apple-converted-space">                  </span>})}</p>
+<p class="p1"><span class="Apple-converted-space">                </span>&lt;/tbody&gt;</p>
+<p class="p1"><span class="Apple-converted-space">              </span>&lt;/table&gt;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">          </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>};</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// Import React hooks at the top</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const { useState, useEffect } = React;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// Render the app</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const root = ReactDOM.createRoot(document.getElementById('root'));</p>
+<p class="p1"><span class="Apple-converted-space">    </span>root.render(&lt;ElectionDashboard /&gt;);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/script&gt;</p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
